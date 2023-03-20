@@ -1,0 +1,23 @@
+user: test
+pass: test
+deploy: 10.1.23.60
+
+cicd: 10.1.23.50
+
+k8s:
+  - master: 10.1.23.41
+  - master: 10.1.23.42
+  - master: 10.1.23.43
+  - worker: 10.1.23.44
+  - worker: 10.1.23.45
+  - worker: 10.1.23.46
+  - worker: 10.1.23.47
+  - worker: 10.1.23.48
+haproxy:
+  - haproxy: 10.1.23.51
+  - haproxy: 10.1.23.52
+  - vip: 10.1.23.80
+
+nfs:
+  - master: 10.1.23.53
+  - slave: 10.1.23.54

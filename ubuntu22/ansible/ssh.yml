@@ -1,0 +1,4 @@
+---
+- hosts: ssh
+  roles:
+    - { role: ssh, become: yes }
