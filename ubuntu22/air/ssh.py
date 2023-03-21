@@ -13,11 +13,8 @@ def genDefault(sshpassYAMLPath, settings):
 
   with open(sshpassYAMLPath, 'a') as sshpassYAML:
     sshpassYAML.write('[ssh]\n')
-    deployIP = settings['deploy']
-    if deployIP:
-      sshpassYAML.write(deployIP + '\n')
-    cicdIP = settings['cicd']
-    if cicdIP:
+    if 'cicd' in settings:
+      cicdIP = settings['cicd']
       sshpassYAML.write(cicdIP + '\n')
 
 def genSSH(svc, sshpassYAMLPath, settings):
@@ -34,7 +31,10 @@ if __name__ == '__main__':
     settings = readyaml.read()
     sshpassYAMLPath= main_path + '/inventory/sshpass.yaml'
     genDefault(sshpassYAMLPath, settings)
-    genSSH('k8s', sshpassYAMLPath, settings)
-    genSSH('haproxy', sshpassYAMLPath, settings)
-    genSSH('nfs', sshpassYAMLPath, settings)
+    if 'k8s' in settings:
+      genSSH('k8s', sshpassYAMLPath, settings)
+    if 'haproxy' in settings:
+      genSSH('haproxy', sshpassYAMLPath, settings)
+    if 'nfs' in settings:
+      genSSH('nfs', sshpassYAMLPath, settings)
 

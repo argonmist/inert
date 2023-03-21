@@ -4,7 +4,7 @@
 docker_check=$(systemctl show --property ActiveState docker)
 
 if [ "$docker_check" == "ActiveState=active" ]; then
-  docker run -ti --rm -v $HOME/inert/ubuntu22:/var/inert -v /etc/hosts:/etc/hosts -w /var/inert --network=host argonhiisi/inert:ubuntu22 bash
+  docker run -ti --rm -v $HOME/inert/ubuntu22:/var/inert -v /etc/hosts:/etc/hosts -v ~/.ssh:/root/.ssh -w /var/inert --network=host argonhiisi/inert:ubuntu22 bash
 else
   echo "run 'systemctl status docker' to make sure docker is active"
 fi

@@ -16,7 +16,12 @@ shift $((OPTIND -1))
 
 
 sshInit(){
+  key=/root/.ssh/id_rsa
+  if [ ! -f "$key" ]; then
+    ssh-keygen -q -t rsa -N '' -f "$HOME/.ssh/id_rsa"
+  fi
   python3 /var/inert/air/ssh.py
+  bash /var/inert/scripts/key_exchange.sh
 }
 
 for a in "${app[@]}"; do
