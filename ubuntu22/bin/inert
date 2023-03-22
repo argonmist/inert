@@ -2,14 +2,14 @@
 
 if [ -z "$1" ]
   then
-    echo "inert -a ssh"
+    echo "inert -a ssh/drbd"
     exit
 fi
 
 while getopts "a:" opt; do
   case $opt in
     a) app+=("$OPTARG");;
-    *) echo 'inert -a ssh' && exit 0 ;;
+    *) echo 'inert -a ssh/drbd' && exit 0 ;;
   esac
 done
 shift $((OPTIND -1))
@@ -24,10 +24,20 @@ sshInit(){
   bash /var/inert/scripts/key_exchange.sh
 }
 
+drbdInit(){
+  bash /var/inert/scripts/gen_r0_res.sh
+  python3 /var/inert/air/drbd.py
+  ansible-playbook -i /var/inert/inventory/drbd.yaml /var/inert/ansible/lvm.yml
+  ansible-playbook -i /var/inert/inventory/drbd.yaml /var/inert/ansible/drbd.yml
+}
+
 for a in "${app[@]}"; do
   case $a in
     ssh)
       sshInit
+      ;;
+    drbd)
+      drbdInit
       ;;
   esac
 done

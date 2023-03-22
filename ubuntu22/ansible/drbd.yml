@@ -1,0 +1,4 @@
+---
+- hosts: drbd
+  roles:
+    - { role: drbd, become: yes }

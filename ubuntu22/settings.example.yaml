@@ -12,6 +12,17 @@ haproxy:
   - haproxy: SECOND_HAPROXY_NODE_IP
   - vip: K8S_VIP
 
-nfs:
-  - master: NFS_MASTER_NODE_IP
-  - slave: NFS_SLAVE_NODE_IP
+drbd:
+  primary:
+    ip: 10.1.23.53
+    hostname: drbd1
+  secondary:
+    hostname:
+    - drbd2
+    ip:
+    - 10.1.23.54
+  disk:
+    path: /dev/sdb
+    size: 100GB
+    mount: /mnt/pgtalk
+  fstype: xfs

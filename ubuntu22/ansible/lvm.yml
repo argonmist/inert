@@ -1,0 +1,4 @@
+---
+- hosts: lvm
+  roles:
+    - { role: lvm, become: yes }

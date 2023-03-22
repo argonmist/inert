@@ -1,0 +1,13 @@
+---
+- name: Install parted dependency
+  package:
+    name: parted
+    state: present
+
+- name: create partition
+  parted:
+    device: "{{ drbd.disk.path }}"
+    number: 1
+    flags: [ lvm ]
+    state: present
+    part_end: "{{ drbd.disk.size }}"

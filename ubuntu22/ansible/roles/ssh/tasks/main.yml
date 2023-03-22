@@ -1,4 +1,0 @@
----
-- name: Generate ssh key
-  shell: |
-    ssh-keygen -q -b 2048 -t rsa -N '' -C 'user' -f /home/user/.ssh/id_rsa creates='/home/user/.ssh/id_rsa'

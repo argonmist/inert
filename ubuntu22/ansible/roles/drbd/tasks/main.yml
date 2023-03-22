@@ -1,0 +1,50 @@
+---
+- name: Install csync2 dependency
+  package:
+    name: csync2
+    state: present
+
+- name: Install drdb dependency
+  package:
+    name: drbd-utils
+    state: present
+
+- name: Remove drdb settings in csync2.cfg file
+  shell: sed -i '/\/etc\/drbd.d\/\*.res/d' /etc/csync2.cfg && sed -i '/\/etc\/drbd.d\/\*.res/d' /etc/csync2.cfg
+
+- name: Add drdb settings to csync2
+  shell: echo 'include /etc/drbd.conf;' >> /etc/csync2.cfg && echo 'include /etc/drbd.d/*.res;' >> /etc/csync2.cfg 
+
+- name: copy nfs.res to drdb nodes
+  copy:
+    src: /var/inert/conf/r0.res
+    dest: /etc/drbd.d/r0.res
+    mode: '0644'
+    remote_src: no
+
+- name: Initializes the metadata storage
+  shell: drbdadm create-md r0
+
+- name: start drbd service
+  shell: systemctl start drbd.service
+
+- name: set primary
+  shell: drbdadm -- --overwrite-data-of-peer primary all
+  delegate_to: drbd-1
+  run_once: true
+
+- name: format the xfs filesystem
+  filesystem:
+    fstype: "{{ drbd.fstype }}"
+    dev: /dev/drbd0
+  delegate_to: drbd-1
+  run_once: true
+
+- name: mount the volume
+  mount:
+    path: "{{ drbd.disk.mount }}"
+    src: /dev/drbd0
+    fstype: "{{ drbd.fstype }}"
+    state: mounted
+  delegate_to: drbd-1
+  run_once: true

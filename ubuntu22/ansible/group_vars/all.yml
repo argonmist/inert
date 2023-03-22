@@ -1,0 +1,18 @@
+user: user
+pass: pass
+nfs_server_path: /mnt/pgtalk
+
+drbd:
+  primary:
+    ip: 10.1.23.53 
+    hostname: drbd1
+  secondary: 
+    hostname:
+    - drbd2
+    ip:
+    - 10.1.23.54
+  disk:
+    path: /dev/sdb
+    size: 100GB
+    mount: /mnt/pgtalk
+  fstype: xfs

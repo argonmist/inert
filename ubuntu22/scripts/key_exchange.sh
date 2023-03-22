@@ -1,18 +1,18 @@
 #!/bin/bash
 export ANSIBLE_HOST_KEY_CHECKING=False
-user=$(yq '.user' < /var/inert/settings.yaml)
+vars='/var/inert/ansible/group_vars/all.yml'
+user=$(yq '.user' < $vars)
 ansible ssh -m shell -a "ssh-keygen -q -b 2048 -t rsa -N '' -C '$user' -f /home/$user/.ssh/id_rsa creates='/home/$user/.ssh/id_rsa'" -i /var/inert/inventory/sshpass.yaml -b -u $user
 ansible ssh -m shell -a "chown -R $user:$user /home/$user/.ssh" -i /var/inert/inventory/sshpass.yaml -b -u $user
 
-deployIP=$(yq '.deploy' < /var/inert/settings.yaml )
-user=$(yq '.user' < /var/inert/settings.yaml )
-pass=$(yq '.pass' < /var/inert/settings.yaml)
-echo $pass
+deployIP=$(yq '.deploy' < $vars )
+user=$(yq '.user' < $vars )
+pass="$(yq '.pass' < $vars)"
 if [ "$deployIP" != "null" ]; then
   echo $deployIP deploy >> /etc/hosts
 fi
 
-cicdIP=$(yq '.cicd' < /var/inert/settings.yaml )
+cicdIP=$(yq '.cicd' < $vars )
 if [ "$cicdIP" != "null" ]; then
   echo $cicdIP cicd >> /etc/hosts
 
@@ -24,22 +24,22 @@ Host cicd
 EOF
 fi
 
-k8s=$(yq ".k8s" < /var/inert/settings.yaml)
+k8s=$(yq ".k8s" < $vars)
 if [ "$k8s" != "null" ]; then
-  k8sc=$(yq e '.k8s | length' < /var/inert/settings.yaml)
+  k8sc=$(yq e '.k8s | length' < $vars)
   mc=0
   wc=0
   for i in $(seq 1 $k8sc); do
     j=$(($i-1))
-    hostname=$(yq ".k8s[$j]" < /var/inert/settings.yaml | cut -d ':' -f1)
+    hostname=$(yq ".k8s[$j]" < $vars | cut -d ':' -f1)
     if [ "$hostname" == "master" ]; then
       mc=$(($mc+1))
-      ip=$(yq ".k8s[$j]" < /var/inert/settings.yaml | cut -d ' ' -f2)
+      ip=$(yq ".k8s[$j]" < $vars | cut -d ' ' -f2)
       echo $ip k8s-m$mc >> /etc/hosts
       sshpass -p $pass ssh-copy-id $user@$ip
     elif [ "$hostname" == "worker" ]; then
       wc=$(($wc+1))
-      ip=$(yq ".k8s[$j]" < /var/inert/settings.yaml | cut -d ' ' -f2)
+      ip=$(yq ".k8s[$j]" < $vars | cut -d ' ' -f2)
       echo $ip k8s-w$wc >> /etc/hosts
       sshpass -p $pass ssh-copy-id $user@$ip
     fi
@@ -56,18 +56,18 @@ Host k8s-w*
 EOF
 fi
 
-haproxy=$(yq ".haproxy" < /var/inert/settings.yaml)
+haproxy=$(yq ".haproxy" < $vars)
 if [ "$haproxy" != "null" ]; then
-  hac=$(yq e '.haproxy | length' < /var/inert/settings.yaml)
+  hac=$(yq e '.haproxy | length' < $vars)
   for i in $(seq 1 $hac); do
     j=$(($i-1))
-    hostname=$(yq ".haproxy[$j]" < /var/inert/settings.yaml | cut -d ':' -f1)
+    hostname=$(yq ".haproxy[$j]" < $vars | cut -d ':' -f1)
     if [ "$hostname" == "haproxy" ]; then
-      ip=$(yq ".haproxy[$j]" < /var/inert/settings.yaml | cut -d ' ' -f2)
+      ip=$(yq ".haproxy[$j]" < $vars | cut -d ' ' -f2)
       echo $ip ha$i >> /etc/hosts
       sshpass -p $pass ssh-copy-id $user@$ip
     elif [ "$hostname" == "vip" ]; then
-      ip=$(yq ".haproxy[$j]" < /var/inert/settings.yaml | cut -d ' ' -f2)
+      ip=$(yq ".haproxy[$j]" < $vars | cut -d ' ' -f2)
       echo $ip vip >> /etc/hosts
     fi
   done
@@ -80,27 +80,23 @@ EOF
 fi
 
 
-nfs=$(yq ".nfs" < /var/inert/settings.yaml)
-if [ "$nfs" != "null" ]; then
-  nfsc=$(yq e '.haproxy | length' < /var/inert/settings.yaml)
-  for i in $(seq 1 $nfsc); do
+drbd=$(yq ".drbd" < $vars)
+if [ "$drbd" != "null" ]; then
+  ip=$(yq ".drbd.primary.ip" < $vars)
+  echo $ip drbd-1 >> /etc/hosts
+  sshpass -p $pass ssh-copy-id $user@$ip
+  drbdc=$(yq e '.drbd.secondary.ip | length' < $vars)
+  for i in $(seq 1 $drbdc); do
     j=$(($i-1))
-    hostname=$(yq ".nfs[$j]" < /var/inert/settings.yaml | cut -d ':' -f1)
-    if [ "$hostname" == "master" ]; then
-      ip=$(yq ".nfs[$j]" < /var/inert/settings.yaml | cut -d ' ' -f2)
-      echo $ip nfs-m >> /etc/hosts
-      sshpass -p $pass ssh-copy-id $user@$ip
-    elif [ "$hostname" == "slave" ]; then
-      ip=$(yq ".nfs[$j]" < /var/inert/settings.yaml | cut -d ' ' -f2)
-      echo $ip nfs-s >> /etc/hosts
-      sshpass -p $pass ssh-copy-id $user@$ip
-    fi
+    k=$(($i+1))
+    ip=$(yq ".drbd.secondary.ip[$j]" < $vars)
+    echo $ip drbd-$k >> /etc/hosts
+    sshpass -p $pass ssh-copy-id $user@$ip
   done
 cat << EOF >> /root/.ssh/config
-Host nfs-*
+Host drbd-*
     USER $user
     StrictHostKeyChecking=no
     IdentityFile ~/.ssh/id_rsa
 EOF
 fi
-

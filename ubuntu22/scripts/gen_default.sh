@@ -1,18 +1,11 @@
+#!/bin/bash
+cat << EOF > /var/inert/inventory/default.yaml
 [all:vars]
-ansible_sudo_pass=Root!234
+ansible_ssh_pass=$2
+ansible_sudo_pass=$2
 ansible_become = True
 ssh_args = -o ControlMaster=auto -o ControlPersist=60s
 host_key_checking=False
 validate_certs=False
-
-[lvm]
-nfs-m
-nfs-s
-
-[drdb]
-nfs-1
-nfs-2
-
-[drdb-primary]
-nfs-1
+EOF
 
