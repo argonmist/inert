@@ -1,0 +1,36 @@
+---
+- name: Install required packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: true
+  loop: "{{ docker.requried_packages }}"
+
+- name: Add docker's official GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add docker repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu jammy stable
+    state: present
+
+- name: Update apt cache and install docker engine
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: true
+  loop: "{{ docker.docker_engines }}"
+
+- name: Check docker group is exists
+  group:
+    name: docker
+    state: present
+
+- name: Add user to docker group
+  user:
+    name: "{{ user }}"
+    group: docker
+
+

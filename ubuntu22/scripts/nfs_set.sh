@@ -1,7 +1,7 @@
 #!/bin/bash
 
 vars='/var/inert/ansible/group_vars/all.yml'
-nfsIP=$(yq ".nfs.ip" < $vars)
+nfsIP=$(yq ".nfs.server.ip" < $vars)
 user=$(yq '.user' < $vars)
 echo "$nfsIP nfs" >> /etc/hosts
 

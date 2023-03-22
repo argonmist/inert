@@ -12,7 +12,7 @@
 
 - name: Recursively change ownership of nfs host dir
   file:
-    path: "{{ nfs.path }}"
+    path: "{{ nfs.server.path }}"
     state: directory
     recurse: yes
     owner: nobody
@@ -22,7 +22,7 @@
 - name: add path to exports
   lineinfile:
     path: /etc/exports
-    line: "{{ nfs.path }} *(rw,sync,no_subtree_check,no_root_squash)"
+    line: "{{ nfs.server.path }} *(rw,sync,no_subtree_check,no_root_squash)"
 
 - name: exportfs
   shell: exportfs -a

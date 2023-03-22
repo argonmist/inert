@@ -1,0 +1,4 @@
+---
+- hosts: nfs-client
+  roles:
+    - { role: nfs-client, become: yes }

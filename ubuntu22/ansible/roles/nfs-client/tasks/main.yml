@@ -1,0 +1,6 @@
+---
+- name: Install nfs-common
+  package:
+    name: nfs-common
+    state: present
+

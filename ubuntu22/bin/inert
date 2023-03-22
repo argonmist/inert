@@ -2,14 +2,14 @@
 
 if [ -z "$1" ]
   then
-    echo "inert -a ssh/drbd"
+    echo "inert -a ssh/drbd/nfs/nfs-client/docker"
     exit
 fi
 
 while getopts "a:" opt; do
   case $opt in
     a) app+=("$OPTARG");;
-    *) echo 'inert -a ssh/drbd' && exit 0 ;;
+    *) echo 'inert -a ssh/drbd/nfs/nfs-client/docker' && exit 0 ;;
   esac
 done
 shift $((OPTIND -1))
@@ -37,6 +37,16 @@ nfsInit(){
   ansible-playbook -i /var/inert/inventory/nfs.yaml /var/inert/ansible/nfs.yml
 }
 
+nfsClient(){
+  python3 /var/inert/air/nfs-client.py 
+  ansible-playbook -i /var/inert/inventory/nfs-client.yaml /var/inert/ansible/nfs-client.yml
+}
+
+docker(){
+  python3 /var/inert/air/docker.py
+  ansible-playbook -i /var/inert/inventory/docker.yaml /var/inert/ansible/docker.yml
+}
+
 for a in "${app[@]}"; do
   case $a in
     ssh)
@@ -47,6 +57,12 @@ for a in "${app[@]}"; do
       ;;
     nfs)
       nfsInit
+      ;;
+    nfs-client)
+      nfsClient
+      ;;
+    docker)
+      docker
       ;;
   esac
 done

@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 ENV LANG=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive 
-COPY bin/inert bin/yq /bin
+COPY bin/inert bin/yq /bin/helm /bin/kubectl /bin/rke /bin
 RUN apt-get update && \
     apt install software-properties-common -y &&\
     add-apt-repository ppa:deadsnakes/ppa && \
