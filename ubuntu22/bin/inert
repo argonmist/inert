@@ -31,6 +31,12 @@ drbdInit(){
   ansible-playbook -i /var/inert/inventory/drbd.yaml /var/inert/ansible/drbd.yml
 }
 
+nfsInit(){
+  bash /var/inert/scripts/nfs_set.sh
+  python3 /var/inert/air/nfs.py
+  ansible-playbook -i /var/inert/inventory/nfs.yaml /var/inert/ansible/nfs.yml
+}
+
 for a in "${app[@]}"; do
   case $a in
     ssh)
@@ -38,6 +44,9 @@ for a in "${app[@]}"; do
       ;;
     drbd)
       drbdInit
+      ;;
+    nfs)
+      nfsInit
       ;;
   esac
 done

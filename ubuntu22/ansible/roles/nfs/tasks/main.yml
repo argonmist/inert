@@ -1,0 +1,32 @@
+---
+- name: Install nfs-server
+  package:
+    name: nfs-kernel-server
+    state: present
+
+- name: Enable nfs service
+  systemd:
+    name: nfs-server
+    enabled: yes
+    masked: no
+
+- name: Recursively change ownership of nfs host dir
+  file:
+    path: "{{ nfs.path }}"
+    state: directory
+    recurse: yes
+    owner: nobody
+    group: nogroup
+    mode: '0777'
+
+- name: add path to exports
+  lineinfile:
+    path: /etc/exports
+    line: "{{ nfs.path }} *(rw,sync,no_subtree_check,no_root_squash)"
+
+- name: exportfs
+  shell: exportfs -a
+
+- name: restart nfs
+  shell: systemctl restart nfs-kernel-server
+

@@ -1,0 +1,4 @@
+---
+- hosts: nfs
+  roles:
+    - { role: nfs, become: yes }

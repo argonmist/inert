@@ -1,6 +1,9 @@
 user: user
 pass: pass
-nfs_server_path: /mnt/pgtalk
+
+nfs:
+  ip: 10.1.23.53
+  path: /mnt/pgtalk
 
 drbd:
   primary:
