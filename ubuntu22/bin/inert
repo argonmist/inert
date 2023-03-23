@@ -2,14 +2,14 @@
 
 if [ -z "$1" ]
   then
-    echo "inert -a ssh/drbd/nfs/nfs-client/docker"
+    echo "inert -a ssh/drbd/nfs/nfs-client/docker/k8s"
     exit
 fi
 
 while getopts "a:" opt; do
   case $opt in
     a) app+=("$OPTARG");;
-    *) echo 'inert -a ssh/drbd/nfs/nfs-client/docker' && exit 0 ;;
+    *) echo 'inert -a ssh/drbd/nfs/nfs-client/docker/k8s' && exit 0 ;;
   esac
 done
 shift $((OPTIND -1))
@@ -47,6 +47,12 @@ docker(){
   ansible-playbook -i /var/inert/inventory/docker.yaml /var/inert/ansible/docker.yml
 }
 
+k8s(){
+  bash /var/inert/scripts/gen_cluster_yaml.sh
+  rke up --ignore-docker-version --config /var/inert/conf/cluster.yaml
+  cp /var/inert/conf/kube_config_cluster.yaml /root/.kube/config
+}
+
 for a in "${app[@]}"; do
   case $a in
     ssh)
@@ -63,6 +69,9 @@ for a in "${app[@]}"; do
       ;;
     docker)
       docker
+      ;;
+    k8s)
+      k8s
       ;;
   esac
 done
