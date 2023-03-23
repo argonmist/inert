@@ -1,0 +1,66 @@
+---
+- name: Add gocd repository
+  shell: echo "deb https://download.gocd.org /" | sudo tee /etc/apt/sources.list.d/gocd.list
+
+- name: Add gocd key
+  apt_key:
+    url: https://download.gocd.org/GOCD-GPG-KEY.asc
+
+- name: Update and install go-agent and go-server
+  apt:
+    pkg: 
+    - go-agent
+    - go-server
+    update_cache: yes
+
+- name: Add sudo group to go user
+  user:
+    name: go
+    group: sudo
+
+- name: Add docker group to go user
+  user:
+    name: go
+    group: docker
+
+- name: Add user go to sudo without password
+  lineinfile:
+    path: /etc/sudoers.d/rookie
+    line: 'go ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    mode: 0440
+    create: yes
+    validate: 'visudo -cf %s'
+
+- name: Recursively change ownership of go-server dir
+  file:
+    path: /usr/share/go-server
+    state: directory
+    recurse: yes
+    owner: go
+    group: go
+
+- name: Recursively change ownership of go-agent dir
+  file:
+    path: /usr/share/go-agent
+    state: directory
+    recurse: yes
+    owner: go
+    group: go
+
+- name: start go-server
+  systemd:
+    state: started
+    name: go-server
+    enabled: true
+
+- name: start go-agent
+  systemd:
+    state: started
+    name: go-agent
+    enabled: true
+
+- name: enable docker for go-agent
+  file:
+    path: /var/run/docker.sock
+    mode: '0666'

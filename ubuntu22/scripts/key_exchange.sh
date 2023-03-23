@@ -12,12 +12,13 @@ if [ "$deployIP" != "null" ]; then
   echo $deployIP deploy >> /etc/hosts
 fi
 
-cicdIP=$(yq '.cicd' < $vars )
-if [ "$cicdIP" != "null" ]; then
-  echo $cicdIP cicd >> /etc/hosts
+gocdIP=$(yq '.gocd' < $vars )
+if [ "$gocdIP" != "null" ]; then
+  echo $gocdIP gocd >> /etc/hosts
+  sshpass -p $pass ssh-copy-id $user@$gocdIP
 
 cat << EOF >> /root/.ssh/config
-Host cicd
+Host gocd
     USER $user
     StrictHostKeyChecking=no
     IdentityFile ~/.ssh/id_rsa

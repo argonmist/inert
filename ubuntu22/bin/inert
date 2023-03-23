@@ -2,14 +2,14 @@
 
 if [ -z "$1" ]
   then
-    echo "inert -a ssh/drbd/nfs/nfs-client/docker/k8s"
+    echo "inert -a ssh/drbd/nfs/nfs-client/docker/k8s/gocd"
     exit
 fi
 
 while getopts "a:" opt; do
   case $opt in
     a) app+=("$OPTARG");;
-    *) echo 'inert -a ssh/drbd/nfs/nfs-client/docker/k8s' && exit 0 ;;
+    *) echo 'inert -a ssh/drbd/nfs/nfs-client/docker/k8s/gocd' && exit 0 ;;
   esac
 done
 shift $((OPTIND -1))
@@ -53,6 +53,11 @@ k8s(){
   cp /var/inert/conf/kube_config_cluster.yaml /root/.kube/config
 }
 
+gocd(){
+  python3 /var/inert/air/gocd.py
+  ansible-playbook -i /var/inert/inventory/gocd.yaml /var/inert/ansible/gocd.yml
+}
+
 for a in "${app[@]}"; do
   case $a in
     ssh)
@@ -72,6 +77,9 @@ for a in "${app[@]}"; do
       ;;
     k8s)
       k8s
+      ;;
+    gocd)
+      gocd
       ;;
   esac
 done

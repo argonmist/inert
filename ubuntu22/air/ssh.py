@@ -19,9 +19,9 @@ def genDefault(sshpassYAMLPath, settings):
 
   with open(sshpassYAMLPath, 'a') as sshpassYAML:
     sshpassYAML.write('[ssh]\n')
-    if 'cicd' in settings:
-      cicdIP = settings['cicd']
-      sshpassYAML.write(cicdIP + '\n')
+    if 'gocd' in settings:
+      gocdIP = settings['gocd']
+      sshpassYAML.write(gocdIP + '\n')
 
 def genSSH(svc, sshpassYAMLPath, settings):
   with open(sshpassYAMLPath, 'a') as sshpassYAML:

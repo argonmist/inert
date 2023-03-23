@@ -1,0 +1,4 @@
+---
+- hosts: gocd
+  roles:
+    - { role: gocd, become: yes }
