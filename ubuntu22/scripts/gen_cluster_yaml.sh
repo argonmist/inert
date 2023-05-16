@@ -59,4 +59,7 @@ services:
     snapshot: true
     creation: 6h
     retention: 24h
+  kubelet:
+    extra_args:
+      runtime-request-timeout: 60m
 EOF
