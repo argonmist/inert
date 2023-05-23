@@ -7,7 +7,7 @@ RUN apt-get update && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-add-repository ppa:ansible/ansible && \
     apt install python3.9 python3.9-dev ansible vim git openssh-server jq \
-    apt-transport-https ca-certificates curl software-properties-common -y
+    apt-transport-https ca-certificates curl software-properties-common zip -y
 
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable"
