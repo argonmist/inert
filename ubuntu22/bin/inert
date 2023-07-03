@@ -48,7 +48,9 @@ docker(){
 }
 
 k8s(){
+  bash /var/inert/scripts/gen_k8s_yaml.sh
   bash /var/inert/scripts/gen_cluster_yaml.sh
+  ansible-playbook -i /var/inert/inventory/k8s.yaml /var/inert/ansible/k8s.yml
   rke up --ignore-docker-version --config /var/inert/conf/cluster.yaml
   cp /var/inert/conf/kube_config_cluster.yaml /root/.kube/config
 }

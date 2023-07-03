@@ -1,0 +1,35 @@
+---
+- name: Create a NM conf directory if it does not exist
+  file:
+    path: /etc/NetworkManager/conf.d/
+    state: directory
+    mode: '0755'
+
+- name: Copy calico conf with owner and permissions
+  copy:
+    src: /var/inert/conf/calico.conf 
+    dest: /etc/NetworkManager/conf.d/calico.conf
+    owner: root 
+    group: root
+    mode: '0644'
+
+- name: NM apply
+  shell: netplan apply
+
+- name: Add sysctl settings 
+  blockinfile:
+    path: /etc/sysctl.conf
+    block: |
+      net.ipv4.ip_forward = 1
+      net.bridge.bridge-nf-call-iptables = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-arptables = 1
+
+- name: Add the br_netfilter module
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: sysctl apply
+  shell: /sbin/sysctl -p
+
